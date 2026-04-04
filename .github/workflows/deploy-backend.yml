@@ -60,3 +60,9 @@ jobs:
         run: |
           RELEASE_DIR=/srv/myapp/backend/releases/${GITHUB_SHA}
           rsync -a --delete "$RELEASE_DIR"/ /srv/myapp/backend/current/
+
+      - name: Restart backend service
+        run: sudo systemctl restart gpx-overfly-be
+
+      - name: Check backend service
+        run: sudo systemctl --no-pager --full status gpx-overfly-be
