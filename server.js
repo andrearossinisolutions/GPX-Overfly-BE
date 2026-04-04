@@ -9,6 +9,7 @@ app.use(express.json())
 
 const PORT = process.env.PORT || 3001
 const OPENAIP_API_KEY = process.env.OPENAIP_API_KEY
+const CESIUM_API_KEY = process.env.CESIUM_API_KEY
 
 if (!OPENAIP_API_KEY) {
   console.error('Missing OPENAIP_API_KEY in .env')
@@ -53,6 +54,13 @@ async function proxyToOpenAip(path, query = {}) {
 
 app.get('/health', (_req, res) => {
   res.json({ ok: true })
+})
+
+app.get('/cesium', (_req, res) => {
+  res.json({
+    ok: true,
+    cesiumApiKey: CESIUM_API_KEY
+  })
 })
 
 /**
