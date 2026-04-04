@@ -1,7 +1,7 @@
-# .github/workflows/deploy-backend.yml
-name: Deploy GPX Overlay Backend
+name: Deploy backend
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
 
@@ -13,29 +13,36 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Show repo files
+        run: |
+          pwd
+          ls -la
+          cat package.json
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Install deps
-        working-directory: ./backend
-        run: npm ci
+      - name: Check Node
+        run: |
+          node -v
+          npm -v
 
-      - name: Build backend
-        working-directory: ./backend
-        run: npm run build
+      - name: Install deps
+        run: npm ci
 
       - name: Prepare release dir
         run: |
           RELEASE_DIR=/srv/myapp/backend/releases/${GITHUB_SHA}
           mkdir -p "$RELEASE_DIR"
 
-      - name: Copy backend files
+      - name: Copy app files
         run: |
           RELEASE_DIR=/srv/myapp/backend/releases/${GITHUB_SHA}
-          rsync -a ./backend/ "$RELEASE_DIR"/ \
+          rsync -a ./ "$RELEASE_DIR"/ \
             --exclude .git \
+            --exclude .github \
             --exclude node_modules
 
       - name: Install production deps in release
@@ -53,9 +60,3 @@ jobs:
         run: |
           RELEASE_DIR=/srv/myapp/backend/releases/${GITHUB_SHA}
           rsync -a --delete "$RELEASE_DIR"/ /srv/myapp/backend/current/
-
-      - name: Restart service
-        run: sudo systemctl restart gpx-overlay-be
-
-      - name: Check service
-        run: sudo systemctl --no-pager --full status gpx-overlay-be
