@@ -1,0 +1,61 @@
+# .github/workflows/deploy-backend.yml
+name: Deploy GPX Overlay Backend
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-backend:
+    runs-on: [self-hosted, linux, x64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install deps
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Build backend
+        working-directory: ./backend
+        run: npm run build
+
+      - name: Prepare release dir
+        run: |
+          RELEASE_DIR=/srv/myapp/backend/releases/${GITHUB_SHA}
+          mkdir -p "$RELEASE_DIR"
+
+      - name: Copy backend files
+        run: |
+          RELEASE_DIR=/srv/myapp/backend/releases/${GITHUB_SHA}
+          rsync -a ./backend/ "$RELEASE_DIR"/ \
+            --exclude .git \
+            --exclude node_modules
+
+      - name: Install production deps in release
+        run: |
+          RELEASE_DIR=/srv/myapp/backend/releases/${GITHUB_SHA}
+          cd "$RELEASE_DIR"
+          npm ci --omit=dev
+
+      - name: Copy env
+        run: |
+          RELEASE_DIR=/srv/myapp/backend/releases/${GITHUB_SHA}
+          cp /srv/myapp/shared/backend/.env "$RELEASE_DIR"/.env
+
+      - name: Publish current
+        run: |
+          RELEASE_DIR=/srv/myapp/backend/releases/${GITHUB_SHA}
+          rsync -a --delete "$RELEASE_DIR"/ /srv/myapp/backend/current/
+
+      - name: Restart service
+        run: sudo systemctl restart gpx-overlay-be
+
+      - name: Check service
+        run: sudo systemctl --no-pager --full status gpx-overlay-be
