@@ -1,12 +1,16 @@
 # GPX Overfly Backend
 
-Backend Express che funge da proxy verso la OpenAIP Core API.
+Express backend that acts as a proxy to the OpenAIP Core API.
 
-Permette di:
+It allows you to:
 
-- proteggere la API key
-- semplificare le chiamate dal frontend
-- recuperare dati aeronautici (VFR points, airspaces)
+- protect the API key
+- simplify calls from the frontend
+- retrieve aeronautical data (VFR points, airspaces)
+
+Use it directly at: <https://gpxoverfly.rossinisolutions.com/>
+
+Feel free to contribute opening a PR!
 
 ---
 
@@ -19,14 +23,14 @@ Permette di:
 
 ---
 
-## Requisiti
+## Requirements
 
 - Node.js 20+
-- API key OpenAIP
+- OpenAIP API key
 
 ---
 
-## Installazione
+## Installation
 
 ```bash
 npm install
@@ -34,18 +38,18 @@ npm install
 
 ---
 
-## Configurazione
+## Configuration
 
-Creare un file `.env` nella root del progetto:
+Create an `.env` file in the project root:
 
 ```env
 PORT=3001
-OPENAIP_API_KEY=la-tua-api-key
+OPENAIP_API_KEY=your-api-key
 ```
 
 ---
 
-## Avvio
+## Startup
 
 ### Development
 
@@ -59,7 +63,7 @@ npm run dev
 npm start
 ```
 
-Server disponibile su:
+Server available on:
 
 ```text
 http://localhost:3001
@@ -67,7 +71,7 @@ http://localhost:3001
 
 ---
 
-## Endpoint
+## Endpoints
 
 ### Health check
 
@@ -78,8 +82,8 @@ GET /health
 Response:
 
 ```json
-{
-  "ok": true
+{ 
+"ok": true
 }
 ```
 
@@ -91,7 +95,7 @@ Response:
 GET /api/reporting-points?bbox=minLon,minLat,maxLon,maxLat
 ```
 
-Esempio:
+Example:
 
 ```http
 GET /api/reporting-points?bbox=9.2,45.1,10.2,45.9
@@ -105,7 +109,7 @@ GET /api/reporting-points?bbox=9.2,45.1,10.2,45.9
 GET /api/airspaces?bbox=minLon,minLat,maxLon,maxLat
 ```
 
-Esempio:
+Example:
 
 ```http
 GET /api/airspaces?bbox=9.2,45.1,10.2,45.9
@@ -113,40 +117,40 @@ GET /api/airspaces?bbox=9.2,45.1,10.2,45.9
 
 ---
 
-## Struttura progetto
+## Project Structure
 
 ```text
 backend/
-  package.json
-  server.js
-  .env
+package.json
+server.js
+.env
 ```
 
 ---
 
-## Variabili ambiente
+## Environment Variables
 
-| Variabile        | Descrizione      | Default |
-|-----------------|------------------|---------|
-| PORT            | Porta server     | 3001    |
-| OPENAIP_API_KEY | API key OpenAIP  | -       |
-
----
-
-## Flusso applicativo
-
-1. Il frontend carica un file GPX
-2. Calcola il bounding box
-3. Chiama il backend:
-   - `/api/reporting-points`
-   - `/api/airspaces`
-4. Il backend chiama OpenAIP
-5. I dati vengono restituiti al frontend
-6. Cesium renderizza i risultati
+| Variable | Description | Default |
+|-----------------|------------------|--------|
+| PORT | Server Port | 3001 |
+| OPENAIP_API_KEY | OpenAIP API Key | - |
 
 ---
 
-## Test rapido
+## Application Flow
+
+1. The frontend loads a GPX file
+2. Calculates the bounding box
+3. Calls the backend:
+- `/api/reporting-points`
+- `/api/airspaces`
+4. The backend calls OpenAIP
+5. The data is returned to the frontend
+6. Cesium renders the results
+
+---
+
+## Quick Test
 
 ```bash
 curl "http://localhost:3001/health"
@@ -162,24 +166,24 @@ curl "http://localhost:3001/api/airspaces?bbox=9.2,45.1,10.2,45.9"
 
 ---
 
-## Note
+## Notes
 
-- Backend stateless
-- Funziona come proxy verso OpenAIP
-- Non esporre mai la API key nel frontend
+- Stateless backend
+- Proxies OpenAIP
+- Never expose the API key in the frontend
 
 ---
 
 ## Roadmap
 
-- caching delle richieste
-- filtri per tipo airspace (CTR, TMA, ATZ)
-- normalizzazione altitudini
-- rate limiting
-- logging avanzato
+- Request caching
+- Airspace type filters (CTR, TMA, ATZ)
+- Altitude normalization
+- Rate limiting
+- Advanced logging
 
 ---
 
-## Licenza
+## License
 
 MIT
